@@ -11,6 +11,9 @@ func hashIt(x, y int) string {
 	return fmt.Sprintf("%d.%d", x, y)
 }
 
+// if I know the sum from 0,10 the sum from 3,7 is inside of that index, so I need
+// to figure it out how to take this difference
+
 func sumInRange(nums []int, queries [][]int) int {
 	var (
 		hashSet = map[string]int{}
