@@ -1,3 +1,14 @@
+/**
+* Given a matrix:
+
+* [1, 2, 3]
+* [4, 5, 6]
+* [7, 8, 9]
+*
+* The algorithm should calculate from 0,0 to 2,2
+* what is the minimum cost to get there
+*/
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
@@ -39,7 +50,7 @@ public class MinCostMatrix {
 		matrix.add(Arrays.asList(7, 8, 9));
 
 		MinCostMatrix minCostMatrix = new MinCostMatrix(matrix);
-		System.out.println(minCostMatrix.getMinCost());
+		System.out.println("Expected result 13 is equal to " + minCostMatrix.getMinCost());
 
 		List<List<Integer>> matrix2 = new ArrayList<List<Integer>>();
 		matrix2.add(Arrays.asList(10, 5, 2));
@@ -47,6 +58,6 @@ public class MinCostMatrix {
 		matrix2.add(Arrays.asList(20, 2, 1));
 
 		MinCostMatrix minCostMatrix2 = new MinCostMatrix(matrix2);
-		System.out.println(minCostMatrix2.getMinCost());
+		System.out.println("Expected result 23 is equal to " + minCostMatrix2.getMinCost());
 	}
 }
