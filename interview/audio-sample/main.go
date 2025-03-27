@@ -19,8 +19,8 @@ func main() {
 	restartOutChan := make(chan bool)
 
 	// Start playback goroutines
-	go handleWavFile("in.wav", inChannel, restartInChan)
-	go handleWavFile("out.wav", outChannel, restartOutChan)
+	go handleWavFile("sample.wav", inChannel, restartInChan)
+	go handleWavFile("sample.wav", outChannel, restartOutChan)
 
 	// Control channel to manage the active channel
 	controlChan := make(chan string)
@@ -97,16 +97,28 @@ func main() {
 func handleWavFile(fileName string, dataChan chan byte, restartChan chan bool) {
 	var mutex sync.Mutex
 	var shouldRestart bool = false
+	var isPlaying bool = false
 
-	// Start the initial playback
+	// Start the playback handler goroutine
 	go func() {
 		for {
 			// Check if we should restart
 			mutex.Lock()
-			if shouldRestart {
+			if shouldRestart && !isPlaying {
 				shouldRestart = false
+				isPlaying = true
+				fmt.Printf("Starting playback of %s now\n", fileName)
 				mutex.Unlock()
+
+				// Play the file
 				readWavFile(fileName, dataChan)
+
+				// Mark playback as finished
+				mutex.Lock()
+				isPlaying = false
+				mutex.Unlock()
+
+				fmt.Printf("File %s finished, sending zeros\n", fileName)
 			} else {
 				mutex.Unlock()
 			}
@@ -117,17 +129,22 @@ func handleWavFile(fileName string, dataChan chan byte, restartChan chan bool) {
 		}
 	}()
 
-	// Start the file once
-	readWavFile(fileName, dataChan)
-	fmt.Printf("File %s finished, sending zeros\n", fileName)
+	// Don't start the file automatically, just send zeros initially
+	fmt.Printf("Channel for %s ready, waiting for key press\n", fileName)
 
 	// Listen for restart signals
 	for {
 		<-restartChan
+
 		mutex.Lock()
-		shouldRestart = true
+		currentlyPlaying := isPlaying
+		if currentlyPlaying {
+			fmt.Printf("Already playing %s, ignoring restart request\n", fileName)
+		} else {
+			shouldRestart = true
+			fmt.Printf("Queueing playback of %s\n", fileName)
+		}
 		mutex.Unlock()
-		fmt.Printf("Restarting playback of %s\n", fileName)
 	}
 }
 
